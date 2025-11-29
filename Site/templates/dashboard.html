@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+
+{% block styles %}
+<style>
+    /* 1. ARKA PLAN AYARI */
+    body {
+        background-image: url("{{ url_for('static', filename='arkaplan.jpg') }}");
+        background-repeat: no-repeat;
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+    }
+
+    /* 2. 'EKLE' BUTONU RENGİ */
+    .btn-ozel {
+        background-color: #436f36; /* Yeşil Tonu */
+        border-color: #436f36;
+        color: white;
+        font-weight: bold;
+    }
+    .btn-ozel:hover {
+        background-color: #283f22;
+        filter: brightness(110%);
+        color: white;
+    }
+
+    /* 3. KART BAŞLIK RENGİ */
+    .kart-baslik-ozel {
+        background-color: #f8f4f0; /* Yaprak Yeşili (Örnek) */
+        color: rgb(0, 0, 0);
+    }
+
+    /* 4. KART ÇERÇEVESİ */
+    .kart-ozel {
+        border: 2px solid #2c3e50;
+        background-color: rgba(255, 255, 255, 0.95);
+    }
+
+    /* --- YENİ EKLENEN BUTON RENKLERİ --- */
+
+    /* 5. SU VER BUTONU AYARLARI */
+    .btn-su {
+        color: #0d6efd;           /* Yazı ve Çerçeve Rengi (Mavi) */
+        border: 2px solid #0d6efd;
+        background-color: transparent; /* İçi boş olsun */
+        font-weight: 600;
+    }
+    .btn-su:hover {
+        background-color: #0d6efd; /* Üstüne gelince içi dolsun */
+        color: white;              /* Yazı beyaz olsun */
+    }
+
+    /* 6. GÜBRE VER BUTONU AYARLARI */
+    .btn-gubre {    
+        color: #856812;            /* Yazı ve Çerçeve Rengi (Sarı/Turuncu) */
+        border: 2px solid #856812;
+        background-color: transparent;
+        font-weight: 600;
+    }
+    .btn-gubre:hover {
+        background-color: #6b5410;
+        color: white;              /* Sarı üstüne siyah yazı daha iyi okunur */
+    }
+
+    /* ----------------------------------- */
+
+    .welcome-box {
+        background-color: #f8f4f0;
+        padding: 15px;
+        border-radius: 10px;
+        display: inline-block;
+        margin-bottom: 20px;
+        
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="welcome-box">
+    <h2 class="m-0">Merhaba, {{ current_user.display_name }}! 👋</h2>
+</div>
+
+<div class="card mb-5 shadow-sm kart-ozel">
+    
+    <div class="card-header kart-baslik-ozel">
+        <h5 class="card-title m-0">Yeni Bitki Ekle</h5>
+    </div>
+
+    <div class="card-body" style="background-color: rgba(255,255,255,0.95);">
+        <form action="{{ url_for('add_plant') }}" method="POST" class="row g-3">
+            <div class="col-md-5">
+                <input type="text" name="name" class="form-control" placeholder="Bitkine verdiğin isim (Örn: Paşa)" required>
+            </div>
+            <div class="col-md-5">
+                <select name="species" class="form-select" required>
+                    <option value="" disabled selected>Bitki Türünü Seç...</option>
+                    {% for type in plant_types %}
+                        <option value="{{ type }}">{{ type }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-ozel w-100">Ekle +</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="row">
+    {% for plant in plants %}
+    <div class="col-md-4 mb-4">
+        <div class="card h-100 kart-ozel">
+            <div class="card-header kart-baslik-ozel d-flex justify-content-between align-items-center">
+                <span>{{ plant.name }}</span>
+                <span class="badge bg-light text-dark">{{ plant.species }}</span>
+            </div>
+            <div class="card-body">
+                <div class="d-flex gap-2 mb-3">
+                    <form action="{{ url_for('log_care', plant_id=plant.id) }}" method="POST" class="flex-fill">
+                        <input type="hidden" name="action" value="su">
+                        <button type="submit" class="btn btn-su w-100">💧 Su Ver</button>
+                    </form>
+                    <form action="{{ url_for('log_care', plant_id=plant.id) }}" method="POST" class="flex-fill">
+                        <input type="hidden" name="action" value="gubre">
+                        <button type="submit" class="btn btn-gubre w-100">🧪 Gübre Ver</button>
+                    </form>
+                </div>
+
+                <h6>Son Hareketler:</h6>
+                <ul class="list-group list-group-flush small">
+                    {% for log in plant.logs[-3:]|reverse %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center bg-transparent">
+                            <span>
+                                {% if log.action_type == 'su' %}💧 Su{% else %}🧪 Gübre{% endif %}
+                            </span>
+                            <span class="text-muted">{{ log.date.strftime('%d.%m %H:%M') }}</span>
+                        </li>
+                    {% else %}
+                        <li class="list-group-item text-muted bg-transparent">Henüz işlem yok.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="col-12 text-center mt-4">
+        <div class="welcome-box">
+            <p class="text-muted m-0">Henüz hiç bitkin yok. Yukarıdan eklemeye başla!</p>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% endblock %}

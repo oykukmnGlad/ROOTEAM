@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-3 mb-4">
+        <div class="list-group">
+            <a href="{{ url_for('forum') }}" class="list-group-item list-group-item-action {% if not active_filter %}active{% endif %}">
+                Tüm Gönderiler
+            </a>
+            <div class="list-group-item bg-light fw-bold">Bitki Türüne Göre</div>
+            {% for cat in categories %}
+                <a href="{{ url_for('forum', species=cat.plant_species) }}" 
+                   class="list-group-item list-group-item-action {% if active_filter == cat.plant_species %}active{% endif %}">
+                    {{ cat.plant_species }}
+                </a>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="col-md-9">
+        
+        <div class="card mb-4 shadow-sm">
+            <div class="card-body">
+                <h5>Yeni Bir Soru Sor / Tavsiye Ver</h5>
+                <form method="POST">
+                    <div class="mb-2">
+                        <input type="text" name="plant_species" class="form-control" placeholder="Hangi bitki hakkında? (Örn: Orkide)" required value="{{ active_filter if active_filter else '' }}">
+                    </div>
+                    <div class="mb-2">
+                        <textarea name="content" class="form-control" rows="2" placeholder="Düşüncelerini yaz..." required></textarea>
+                    </div>
+                    <div class="text-end">
+                        <button type="submit" class="btn btn-primary">Gönder Paylaş</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+       {% for post in posts %}
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h6 class="card-subtitle mb-2 text-muted d-flex justify-content-between">
+                        <span>
+                            <span class="badge bg-info text-dark">{{ post.plant_species }}</span>
+                            
+                            &bull; <strong>{{ post.author.username }}</strong>
+                        </span>
+                        
+                        <small>{{ post.date.strftime('%d.%m.%Y') }}</small>
+                    </h6>
+                    <p class="card-text">{{ post.content }}</p>
+                </div>
+            </div>
+        {% else %}
+            <div class="alert alert-info">Bu kategoride henüz gönderi yok.</div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

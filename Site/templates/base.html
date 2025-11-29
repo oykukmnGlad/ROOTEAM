@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FloraHeal</title>
+
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon.png') }}">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    {% block styles %}{% endblock %}
+    <style>
+        /* Bootstrap'in yeşilini kendi istediğin yeşille ezmek için */
+    .bg-success, .btn-success {
+    background-color: #0f261f !important; /* Örn: Orman yeşili */
+    border-color: #0f261f!important;
+}
+
+
+
+        /* İsteğe bağlı: Genel sayfa arka planını biraz daha yumuşatalım */
+        body { background-color: #f8f9fa; }
+        /* Kartların gölgesini biraz daha belirginleştirelim */
+        .card { box-shadow: 0 4px 8px rgba(0,0,0,0.05); border: none; }
+
+
+        /* Sadece Logo Kısmını Hedefle */
+       .navbar-brand {
+        font-family: "Playfair Display", serif;
+        font-size: 32px;
+         /* ...diğer ayarlar... */
+        }
+        
+
+        /* Diğer genel ayarların */
+        body { background-color: #f8f9fa; }
+    </style>
+</head>
+<body class="bg-light">
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-success mb-4">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('dashboard') }}">🌱 FloraHeal</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    {% if current_user.is_authenticated %}
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('dashboard') }}">Bitkilerim</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('forum') }}">Forum</a></li>
+                        <li class="nav-item"><a class="nav-link btn btn-danger btn-sm text-white ms-2" href="{{ url_for('logout') }}">Çıkış</a></li>
+                    {% else %}
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('login') }}">Giriş Yap</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('register') }}">Kayıt Ol</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-warning">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
